@@ -33,8 +33,21 @@ library(shinydashboard)
 library(shinyWidgets)
 library(shiny)
 
+# Create path to Github file
+repo_owner <- "arjanmeddens"   # Put the owner of the Repo here
+repo_name <- "PostFireTools-"      # Put the name of the Repo here
+branch <- "main"                 # Put the Repo branch here
+repo_file <- "DST_table_v1.csv"        # The name of the .csv file you want
+
+url <- paste0(
+  "https://raw.githubusercontent.com/",
+  repo_owner, "/", repo_name, "/", branch, "/", repo_file
+)
+response <- GET(url)
+table_dst <- read_csv(content(response, "text"))
+
 # Load tool table
-table_dst = read.csv("~/workspace/R/8_Postfire_regen/1_code/4_DST_app_shiny/DST_table_v1.csv")
+#table_dst = read.csv("~/workspace/R/8_Postfire_regen/1_code/4_DST_app_shiny/DST_table_v1.csv")
 phase  = levels(factor(table_dst[,3]))
 step = levels(factor(table_dst[,4]))
 task   = levels(factor(table_dst[,5]))

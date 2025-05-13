@@ -43,8 +43,7 @@ url <- paste0(
   "https://raw.githubusercontent.com/",
   repo_owner, "/", repo_name, "/", branch, "/", repo_file
 )
-response <- GET(url)
-table_dst <- read_csv(content(response, "text"))
+table_dst <- read.csv(file=url)
 
 # Load tool table
 #table_dst = read.csv("~/workspace/R/8_Postfire_regen/1_code/4_DST_app_shiny/DST_table_v1.csv")

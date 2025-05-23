@@ -34,7 +34,20 @@ library(shiny)
 linebreaks <- function(n){HTML(strrep(br(), n))}
 
 # Load tool table
-table_dst = read.csv("~/workspace/R/8_Postfire_regen/1_code/6_PostFireTools_App_V1/DST_table_v4.csv")
+#table_dst = read.csv("~/workspace/R/8_Postfire_regen/1_code/6_PostFireTools_App_V1/DST_table_v4.csv")
+library(httr)
+# Createhttr# Create path to Github file
+repo_owner <- "arjanmeddens"   # Put the owner of the Repo here
+repo_name <- "FireToolMenu"      # Put the name of the Repo here
+branch <- "main"                 # Put the Repo branch here
+repo_file <- "DST_table_v4.csv"        # The name of the .csv file you want
+
+url <- paste0(
+  "https://raw.githubusercontent.com/",
+  repo_owner, "/", repo_name, "/", branch, "/", repo_file
+)
+table_dst <- read.csv(file=url)
+
 phase  = levels(factor(table_dst[,3]))
 step = levels(factor(table_dst[,4]))
 task   = levels(factor(table_dst[,5]))

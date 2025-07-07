@@ -110,7 +110,7 @@ ui <- dashboardPage(
               p("Tasks = Specific activities of postfire decision-making (13 Tasks that fall under a specific Step (See Figure 1))",style = "font-family: 'arial'; font-si48pt",br()),
               p("DST = Desiscion Support Tool",style = "font-family: 'arial'; font-si48pt",br()),
               p(),width=12)),
-            column(12,box(img(src="Tools_v1.png",width=850),
+            column(12,box(img(src="Tools_V1.png",width=850),
                         title="Figure 1: Framework for Menu of Tools for Postfire Management, featuring decision stages and tasks",width=12)),
             #column(12,box(title ='Compass',
             #              p("Tasks = Specific activities of postfire decision-making (13 Tasks that fall under a specific Step (See Figure 1))"),

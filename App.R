@@ -16,16 +16,20 @@
 #
 #############################################################################################################################################
 # LOAD PACKAGES
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
 #remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
+#install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
 #install.packages("shinyWidgets")
 # library(shinydashboard)
 # library(shinyWidgets)
 # library(shiny)
 
-options(repos = c(CRAN = "https://cloud.r-project.org/"))
+require(shinydashboard)
+
+print("check for testing")
 
 # Define list of required packages:
-list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT")
+#list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT")
 # Check for packages and install if needed:
 new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
 if(length(new.packages) > 0) install.packages(new.packages,repos = "https://cran.rstudio.com/")

@@ -1,9 +1,10 @@
 #############################################################################################################################################
-# Script Name:  Shiny_DST_NWCASC_250512.r
-# Description:  Seclect post-fire management tools
-# Author:       Arjan Meddens & Abhinav Shrestha (& NW CASC project group)
-# Date:         Aug 2025
+# Script Name:  app.r
+# Description:  Select post-fire management tools
+# Author:       Arjan Meddens (& NW CASC project group)
+# Date:         Jun 2026
 # R-version: 4.5-arm64 (on Mac)
+# Note:		Note that the CSV file has comma's in the citations and Excel sometime reads these as delim. 
 # Note:		https://shiny.posit.co/r/gallery/
 # Note:   https://rstudio.github.io/shinydashboard/get_started.html
 # Note:   https://mastering-shiny.org/
@@ -22,7 +23,7 @@
 # library(shiny)
 
 # Define list of required packages:
-list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools")
+list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT")
 # Check for packages and install if needed:
 new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
 if(length(new.packages) > 0) install.packages(new.packages)
@@ -36,11 +37,13 @@ linebreaks <- function(n){htmltools::HTML(strrep(htmltools::tags$br(), n))}
 
 # LOAD DATA:
 # Load tool table
-table_dst = read.csv("DST_table_v4.csv")
-phase  = levels(factor(table_dst[,3]))
-step = levels(factor(table_dst[,4]))
-task   = levels(factor(table_dst[,5]))
-statis = levels(factor(table_dst[,6]))
+table_dst = read.csv("DST_table_v5.csv") # update May 26 2026
+#names(table_dst)
+#dim(table_dst)
+phase  = levels(factor(table_dst[,9]))
+step = levels(factor(table_dst[,10]))
+task   = levels(factor(table_dst[,11]))
+#statis = levels(factor(table_dst[,6]))
 # Replace phase with <- c("Emergency Stabilization","Rehabilitation & Recovery","Restoration & Adaptation")
 overview_txt = c('  (a)	Decision phase: Emergency stabilization, rehabilitation, and climate adaptive phase. (b)	Decision Step, including assess, plan, implement and monitor, and evaluate. This compass can inform resource managers about the availability of diverse types of decision support tools and orient resource managers to the use of available tools.')
 head(table_dst)
@@ -50,12 +53,13 @@ head(table_dst)
 ###--------------------------------------------------------###
 # Shiny App code
 ui <- shinydashboard::dashboardPage(
+  
   shinydashboard::dashboardHeader(title = "FireToolMenu"),
 
 
-  
+
   ## Sidebar content
-  shinydashboard::dashboardSidebar(
+  shinydashboard::dashboardSidebar(collapsed = FALSE,
     shinydashboard::sidebarMenu(
       shinydashboard::menuItem("Overview", tabName = "Overview"),
       shinydashboard::menuItem("Menu of Tools", tabName = "Selecttool"),
@@ -65,6 +69,7 @@ ui <- shinydashboard::dashboardPage(
     )
   ),
   
+
   ## Body content
   shinydashboard::dashboardBody(
     
@@ -72,10 +77,13 @@ ui <- shinydashboard::dashboardPage(
     htmltools::tags$head(
       htmltools::tags$style(
         htmltools::HTML(
-          '.navbar-custom-menu {
+            '.navbar-custom-menu {
               position: absolute;
               display: inline-block;
               margin-top: 5px;
+            }
+            .sidebar-toggle {
+            display: none;
             }'
           )
         ), 
@@ -86,7 +94,6 @@ ui <- shinydashboard::dashboardPage(
       htmltools::tags$link(rel = "shortcut icon", type = "image/png", href = "favicon-32.png"),             
                     
     ),
-
 
     # START TABS
     shinydashboard::tabItems(
@@ -140,7 +147,7 @@ ui <- shinydashboard::dashboardPage(
               shinydashboard::box(title = htmltools::div(class = 'box-title', htmltools::p("Figure 1: Framework for Menu of Tools for Postfire Management, featuring decision stages and tasks")),
               htmltools::div(class = "center-image",
                         htmltools::tags$img(src = "Tools_V1.png", style = "width: 100%")),
-                        ,width=12)),
+                        width=12)),
 
             shiny::column(width=12,
               shinydashboard::box(title = htmltools::div(class = 'box-title', htmltools::p(htmltools::tags$strong("Post-fire Management Compass"), "(Steen-Adams et al.", htmltools::tags$i("in prep"), ")")),
@@ -204,47 +211,43 @@ ui <- shinydashboard::dashboardPage(
               htmltools::tags$img(src="FireToolMenu_logo1.png",width=200),title="", style = 'text-align:right;'), 
               htmltools::tags$br()
             ),
-              
-          shiny::fluidRow(
-            shiny::column(width=4,
-              pickerInput("dropdown1", h3("Phase (Select your descision phase):"), choices = phase, multiple = T), #-- PHASE --#
-              htmltools::p(linebreaks(3)),
+          shinydashboard::tabBox(
+            id = "UserInputs",
+            width = 12,
+            tabPanel("Menu of Tools",
+              style = "font-family: 'arial'; font-size: 18pt;",
+              shiny::fluidRow(
+                shiny::column(width=3,
+                  pickerInput("dropdown1", h3("Phase (Select your descision phase):"), choices = phase, multiple = T), #-- PHASE --#
+                  htmltools::p(linebreaks(3))),
+                shiny::column(width=3,
+                  uiOutput("dropdown2"), #-- STEP --#
+                  htmltools::p(linebreaks(3))),
+                shiny::column(width=3,
+                  uiOutput("dropdown3"), #-- TOOL --#
+                  htmltools::p(linebreaks(3)))),
 
-              uiOutput("dropdown2"), #-- STEP --#
-              htmltools::p(linebreaks(3)),
-
-              # actionButton(inputId = "findTool", label = "Find Tool", icon = NULL, width = NULL),
-              uiOutput("dropdown3"), #-- TOOL --#
-              htmltools::p(linebreaks(3))),
-
-            shiny::column(width=8,
               shinydashboard::box(
-                htmltools::div(class = "text-center",
-                  htmltools::tags$img(src = "Compass_v1.png", style = "width: 100%; height: auto;")),
-                         title="Post-fire Management Compass (Steen-Adams et al. in prep)",width=12)
-              ),
-            
-           shinydashboard::box(
-              htmltools::div(
-                h2(htmltools::tags$strong("OUTPUT:")), style='margin-left: 30px'
-              ),
-              htmltools::tags$br(), 
+                  htmltools::div(
+                    h2(htmltools::tags$strong("OUTPUT:")), style='margin-left: 30px'
+                  ),
+                  htmltools::tags$br(), 
 
-              shiny::column(width=12,
-                shinydashboard::box(verbatimTextOutput("selected_var1"),title="Choice:",width=12)
-              ),
-              shiny::column(width=12,
-                shinydashboard::box(textOutput("selected_var4"),title="Tool Description",width=12)
-              ),
-              shiny::column(width=12,
-                shinydashboard::box(uiOutput("selected_var5"),title="Website of Tool",width=12)
-              ), # using `uiOutput` instead to print out clickable URL
-              shiny::column(width=12,
-                shinydashboard::box(textOutput("selected_var6"),title="Tool Citation",width=12)
-              ),
-            style = "border: 1px solid #000000; background-color: #818589; padding: 6px; border-radius: 5px; color: #000000;", width = 12)
+                  shiny::column(width=12,
+                    shinydashboard::box(verbatimTextOutput("selected_var1"),title="Choice:",width=12)
+                  ),
+                  shiny::column(width=12,
+                    shinydashboard::box(div(DT::DTOutput("toolTable"), style="font-size: 80%"),title="Selected Tools",width=12)
+                  ),
+                  shiny::column(width=12,
+                    shinydashboard::box(shiny::downloadButton("downloadTable", "CLICK TO DOWNLOAD TABLE and METADATA"), width=12)
+                  ),
+                style = "border: 1px solid #000000; background-color: #818589; padding: 6px; border-radius: 5px; color: #000000;", width = 12)
+             
+
+            ) # TAB 2 (Multi Tool)
    
-          ) # FLUIDROW  
+          ) # TABBOX
         )   # FLUIDPAGE
       ),    # TABITEM
       #----- End (B) -------
@@ -354,7 +357,7 @@ ui <- shinydashboard::dashboardPage(
                         linebreaks(2),
                         htmltools::p(htmltools::tags$em("* Please click on the images to navigate to their respective websites"), style='text-align:right; color: gray'),
                         linebreaks(2),
-                        shinydashboard::box(status = 'warning',htmltools::tags$em("The conclusions and views presented in this work are those of the authors and should not be interpreted as representative of the views or policies of USGS, nor should any commercial products mentioned in the text be misinterpreted as being endorsed by USGS, JFSP, or NWCASC."),  style = "font-family: 'arial'; font-si24pt; border: 2px solid #ff6700;", width = 12), 
+                        shinydashboard::box(status = 'warning',htmltools::tags$em("The conclusions and views presented in this work are those of the authors and should not be interpreted as representative of the views or policies of USGS, nor should any commercial products mentioned in the text be misinterpreted as being endorsed by USGS or NWCASC."),  style = "font-family: 'arial'; font-si24pt; border: 2px solid #ff6700;", width = 12), 
                         style = "font-family: 'arial'; font-si24pt",width=12)
               ),
 
@@ -413,11 +416,11 @@ ui <- shinydashboard::dashboardPage(
                                       htmltools::p("- Michelle Steen-Adams,", htmltools::tags$a(href="m.steen-adams@wsu.edu", target="_blank","m.steen-adams@wsu.edu")),
                                       htmltools::p("- Arjan Meddens,",  htmltools::tags$a(href="arjan.meddens@wsu.edu", target="_blank","arjan.meddens@wsu.edu")),
                                       htmltools::p(linebreaks(2)),
-                                      htmltools::p("Co-Investigators:"),
+                                      htmltools::p("Co-Investigators"),
                                       htmltools::p("- Amanda Stahl,", htmltools::tags$a(href="atstahl@wsu.edu", target="_blank","atstahl@wsu.edu")),
                                       htmltools::p("- Robert Andrus,", htmltools::tags$a(href="robert.andrus@wsu.edu",target="_blank","robert.andrus@wsu.edu")),
                                       htmltools::p(linebreaks(2)),
-                                      htmltools::p("Researchers:"),
+                                      htmltools::p("Researchers"),
                                       htmltools::p("- Joe Celebrezze,", htmltools::tags$a(href="joseph.celebrezze@wsu.edu", target="_blank", "joseph.celebrezze@wsu.edu")),
                                       htmltools::p("- Madeline Franz,", htmltools::tags$a(href="madeline.franz@wsu.edu", target="_blank", "madeline.franz@wsu.edu")),
                                       htmltools::p("- Abhinav Shrestha,", htmltools::tags$a(href="abhinav.shrestha96@gmail.com", target="_blank", "abhinav.shrestha96@gmail.com"))
@@ -549,7 +552,8 @@ server <- function(input, output, session) {
  })
 
 
-  ## Dropdown 2 -- Reaction values function 
+
+   ## Dropdown 2 -- Reaction values function 
   values.func2 <- shiny::reactive({
     req(input$dropdown1)
     if (length(input$dropdown1) == 1) {
@@ -576,7 +580,7 @@ server <- function(input, output, session) {
       #tmp2_index  = which(tmp_dst[,4] ==  "Plan")
       #tmp_dst2 = tmp_dst[tmp2_index,]
       if(input$dropdown2 == c("All")) {
-        tmp1_index  = which(table_dst[,3] ==  input$dropdown1)
+        tmp1_index  = which(table_dst[,9] ==  input$dropdown1)
         tmp_dst2 = table_dst[tmp1_index,]
         if(length(c(tmp_dst2[,2]))==0){
           return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
@@ -586,9 +590,9 @@ server <- function(input, output, session) {
         }
         
       } else {
-        tmp1_index  = which(table_dst[,3] ==  input$dropdown1)
+        tmp1_index  = which(table_dst[,9] ==  input$dropdown1)
         tmp_dst = table_dst[tmp1_index,]
-        tmp2_index  = which(tmp_dst[,4] ==  input$dropdown2)
+        tmp2_index  = which(tmp_dst[,10] ==  input$dropdown2)
         tmp_dst2 = tmp_dst[tmp2_index,]
         if(length(c(tmp_dst2[,2]))==0){
           return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
@@ -599,9 +603,9 @@ server <- function(input, output, session) {
       }
     }
     if (length(input$dropdown1) == 2) {
-      tmp1_index  = which(table_dst[,3] ==  input$dropdown1[1] | table_dst[,3] ==  input$dropdown1[2])
+      tmp1_index  = which(table_dst[,9] ==  input$dropdown1[1] | table_dst[,9] ==  input$dropdown1[2])
       tmp_dst = table_dst[tmp1_index,]
-      tmp2_index  = which(tmp_dst[,4] ==  input$dropdown2[1])
+      tmp2_index  = which(tmp_dst[,10] ==  input$dropdown2[1])
       tmp_dst2 = tmp_dst[tmp2_index,]
       if(length(c(tmp_dst2[,2]))==0){
           return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
@@ -611,9 +615,9 @@ server <- function(input, output, session) {
       
     }
     if (length(input$dropdown1) == 3) {
-      tmp1_index  = which(table_dst[,3] ==  input$dropdown1[1] | table_dst[,3] ==  input$dropdown1[2] | table_dst[,3] ==  input$dropdown1[3])
+      tmp1_index  = which(table_dst[,9] ==  input$dropdown1[1] | table_dst[,10] ==  input$dropdown1[2] | table_dst[,11] ==  input$dropdown1[3])
       tmp_dst = table_dst[tmp1_index,]
-      tmp2_index  = which(tmp_dst[,4] ==  input$dropdown2[1])
+      tmp2_index  = which(tmp_dst[,9] ==  input$dropdown2[1])
       tmp_dst2 = tmp_dst[tmp2_index,]
       if(length(c(tmp_dst2[,2]))==0){
           return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
@@ -623,23 +627,25 @@ server <- function(input, output, session) {
       
     }
   })
+
+ 
    
   
   #----------------------------------------------------------------------------------------------
   ## Reactive Dropdown 2 # STEP out
   output$dropdown2 <- renderUI({
     #htmltools::HTML(paste0("Output 1 here", collapse = "<br>"))
+    # print("HERE2")
     pickerInput("dropdown2", h3("Step (Select your descision Step):"), choices = values.func2(), options = pickerOptions(
       actionsBox = TRUE,title = "Please select a Descision Step"))
   })
-  
+     
   ## Reactive Dropdown 3 # TASK out
   output$dropdown3 <- renderUI({
-    pickerInput("dropdown3", h3("Tool (select tool for more Information):"), choices = values.func3(),options = pickerOptions(
+    pickerInput("dropdown3", h3("Tool (select tool for more Information):"), choices = values.func3(), multiple = T, options = pickerOptions(
       actionsBox = TRUE,title = "Please select a Tool"))
   })
 
-  
   # Check the outputs of the tool selection, warn user if there are no tools found
   shiny::observe({
     tools <- values.func3()
@@ -650,16 +656,10 @@ server <- function(input, output, session) {
 
     } else {
       # noToolsFlag(FALSE)
-      
+
     }
   })
 
-
-# Reactive function to count the number of options selected for input$dropdown1
-# countInput <- shiny::reactive({
-#     req(input$INPUT_ID)
-#     return(length(input$INPUT_ID))
-# })  
 
 # Reactive function that concatenates multiple selection of input$dropdown1 as single string for print
 inputdropdown1_selectOpt <- shiny::reactive({  
@@ -673,13 +673,28 @@ inputdropdown1_selectOpt <- shiny::reactive({
       return(input$dropdown1)
     }
 })
+  
 
- 
+# Reactive function that concatenates multiple selection of input$dropdown3 as single string for print
+inputdropdown3_selectOpt <- shiny::reactive({  
+    if(length(input$dropdown3) > 1){
+      strOut <- as.character()
+      for(i in 1:length(input$dropdown3)){
+        strOut <- cbind(strOut, input$dropdown3[i])
+      }
+      return(toString(strOut))
+    } else{
+      return(input$dropdown3)
+    }
+})
+
+
   ## Reactive Output text 1
   output$selected_var1 <- shiny::renderText({
       req(input$dropdown1, input$dropdown2, input$dropdown3) # clears output if user reselects options
-      paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", input$dropdown2), "Tool: ",  paste("-", input$dropdown3), sep='\n')
+      paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", input$dropdown2), "Tool: ",  paste("-", inputdropdown3_selectOpt()), sep='\n')
   })
+
 
   #  ## Reactive Output text 2
 #  output$selected_var2 <- shiny::renderText({
@@ -690,22 +705,71 @@ inputdropdown1_selectOpt <- shiny::reactive({
 #    paste(input$dropdown3,"Choice")
 #  })
   
-  ## Reactive Output text 4 -- Tool Description
-  output$selected_var4 <- shiny::renderText({
-    paste((table_dst[c(which(table_dst[,2] == input$dropdown3)),7]))
+
+  get_SelectedToolTable <- shiny::reactive({
+    req(values.func3())  # ensures it’s available before rendering
+    selectedTools <- c(input$dropdown3) # pass `values.func()` to output ALL AVAILABLE TOOLS
+
+    # Testing
+     #print(paste0('returned values: ', selectedTools)) # Testing
+     #selectedTools = "PFS Decision Tree"
+     #subsetDF <- table_dst[table_dst$Short.Title %in% selectedTools, ]
+    # Testing
+     
+    subsetDF <- table_dst[table_dst$Short.Title %in% selectedTools, ]
+    outDF <- subsetDF[,c(3, 4, 5, 15)]  #- OLD: subsetDF[,c(2, 7:9)]   # outDF only has 4 columns (tool, desc, URL, citation) # UPDATE: 
+    colnames(outDF)[colnames(outDF) == "Short.Title"] <- "Tool"
+    return(outDF)
+    }
+  )
+  get_SelectedChoicesMetadata <- shiny::reactive({
+    req(input$dropdown1, input$dropdown2, input$dropdown3) # clears output if user reselects options
+    outMetaTxt <- paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", input$dropdown2), "Tool: ",  paste("-", inputdropdown3_selectOpt()), sep='\n')
+    return(outMetaTxt)
   })
 
-  ## Reactive Output text 5 -- Tool website
-  output$selected_var5 <- renderUI({
-      url_link <- paste((table_dst[c(which(table_dst[,2] == input$dropdown3)),8]))
-      tagList(a(href = url_link, target='_blank', url_link)) # outputs text like an HTML a-tag with `target='_blank'` to open in new tab
-  })
-  
-  ## Reactive Output text 6 -- Tool Citation
-  output$selected_var6 <- shiny::renderText({
-    paste((table_dst[c(which(table_dst[,2] == input$dropdown3)),9]))
-  })
-  
+  # selectedTools <- c('Short BAR guide', 'Data Basin', 'ClimResilToolkit') # replace this is `values.func3()`
+  output$toolTable <- DT::renderDT({
+      DT::datatable(get_SelectedToolTable(), 
+                    extensions = c("FixedColumns","FixedHeader"), # Enables fixed header and column (https://stackoverflow.com/questions/69835894/workaround-for-issues-with-freezing-header-in-dtdatatable-in-r-shiny)
+                    rownames = FALSE, 
+                    options = list(scrollX = T, scrollY = T, fixedHeader = T, fixedColumns = list(leftColumns = 1)))
+      })
+
+    output$downloadTable <- shiny::downloadHandler(
+      filename = function() {
+        paste('FireToolMenu_OUTPUT_', Sys.Date(), '.zip', sep='')
+      },
+      content = function(file) {
+
+        # checks if output table exists
+        tryCatch({
+         get_SelectedToolTable() # check
+          # zip output table and metadata (input/choices) https://groups.google.com/g/shiny-discuss/c/zATYJCdSTwk
+          tmpdir <- tempdir()
+          setwd(tmpdir)
+          print(tmpdir)
+                    
+          outMetaTxt <- get_SelectedChoicesMetadata()
+          writeLines(outMetaTxt, paste('FireToolMenu_Metadata_', Sys.Date(), '.txt', sep=''))
+          
+          write.csv(get_SelectedToolTable(), paste('FireToolMenu_SelectedTools_', Sys.Date(), '.csv', sep=''), row.names=FALSE)
+          fileList <- c(paste('FireToolMenu_Metadata_', Sys.Date(), '.txt', sep=''), paste('FireToolMenu_SelectedTools_', Sys.Date(), '.csv', sep=''))
+
+          zip::zip(file, files = fileList)
+          
+                       
+        
+        },
+          shiny.silent.error = function(e) {
+            shiny::showModal(shiny::modalDialog(title ="DOWNLOAD ERROR: no tools selected", "Please use the download button once all inputs are selected and an output table is generated!!!")) # https://shiny.posit.co/r/reference/shiny/0.14/showmodal.html
+          }
+        )
+          
+       
+      }
+    )
+
   
   #- Testing
   #dropdown3 = c("A guidebook to spatial datasets for conservation planning under climate change in the Pacific Northwest")

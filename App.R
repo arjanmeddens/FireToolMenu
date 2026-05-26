@@ -17,12 +17,12 @@
 #############################################################################################################################################
 # LOAD PACKAGES
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
-#remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
-#install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
-#install.packages("shinyWidgets")
-# library(shinydashboard)
-# library(shinyWidgets)
-# library(shiny)
+remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
+install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
+install.packages("shinyWidgets")
+ library(shinydashboard)
+ library(shinyWidgets)
+ library(shiny)
 
 require(shinydashboard)
 

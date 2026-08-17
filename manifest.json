@@ -9,6 +9,11 @@
     "content_category": null,
     "has_parameters": false
   },
+  "environment": {
+    "r": {
+      "requires": "~=4.5.0"
+    }
+  },
   "packages": {
     "DT": {
       "Source": "CRAN",
@@ -1353,6 +1358,33 @@
         "Built": "R 4.5.2; ; 2026-02-20 12:12:49 UTC; unix"
       }
     },
+    "shinyWidgets": {
+      "Source": "CRAN",
+      "Repository": "https://cloud.r-project.org",
+      "description": {
+        "Package": "shinyWidgets",
+        "Title": "Custom Inputs Widgets for Shiny",
+        "Version": "0.9.1",
+        "Authors@R": "c(\n  person(\"Victor\", \"Perrier\", email = \"victor.perrier@dreamrs.fr\", role = c(\"aut\", \"cre\", \"cph\")),\n  person(\"Fanny\", \"Meyer\", role = \"aut\"),\n  person(\"David\", \"Granjon\", role = \"aut\"),\n  person(\"Ian\", \"Fellows\", role = \"ctb\", comment = \"Methods for mutating vertical tabs & updateMultiInput\"),\n  person(\"Wil\", \"Davis\", role = \"ctb\", comment = \"numericRangeInput function\"),\n  person(\"Spencer\", \"Matthews\", role = \"ctb\", comment = \"autoNumeric methods\"),\n  person(family = \"JavaScript and CSS libraries authors\", role = c(\"ctb\", \"cph\"), comment = \"All authors are listed in LICENSE.md\")\n  )",
+        "Description": "Collection of custom input controls and user interface components for 'Shiny' applications. \n  Give your applications a unique and colorful style !",
+        "URL": "https://github.com/dreamRs/shinyWidgets,\nhttps://dreamrs.github.io/shinyWidgets/",
+        "BugReports": "https://github.com/dreamRs/shinyWidgets/issues",
+        "License": "GPL-3",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "RoxygenNote": "7.3.3",
+        "Depends": "R (>= 3.1.0)",
+        "Imports": "bslib, sass, shiny (>= 1.6.0), htmltools (>= 0.5.1), jsonlite,\ngrDevices, rlang",
+        "Suggests": "testthat, covr, ggplot2, DT, scales, shinydashboard,\nshinydashboardPlus",
+        "NeedsCompilation": "no",
+        "Packaged": "2026-03-06 05:06:15 UTC; perri",
+        "Author": "Victor Perrier [aut, cre, cph],\n  Fanny Meyer [aut],\n  David Granjon [aut],\n  Ian Fellows [ctb] (Methods for mutating vertical tabs &\n    updateMultiInput),\n  Wil Davis [ctb] (numericRangeInput function),\n  Spencer Matthews [ctb] (autoNumeric methods),\n  JavaScript and CSS libraries authors [ctb, cph] (All authors are listed\n    in LICENSE.md)",
+        "Maintainer": "Victor Perrier <victor.perrier@dreamrs.fr>",
+        "Repository": "CRAN",
+        "Date/Publication": "2026-03-09 08:30:02 UTC",
+        "Built": "R 4.5.2; ; 2026-03-09 09:41:32 UTC; unix"
+      }
+    },
     "shinydashboard": {
       "Source": "CRAN",
       "Repository": "https://cloud.r-project.org",
@@ -1657,7 +1689,7 @@
       "checksum": "1a7569906097c3a3849c8417e19ded1a"
     },
     "App.R": {
-      "checksum": "1d15ddfdade79a135e29937013f15e00"
+      "checksum": "93eb59a15435eaf1e7debdae8de8b1bb"
     },
     "Create_gethub_download_dir_Shiny2.R": {
       "checksum": "06bd256dad7aa23aba66fe59a8eaf02c"
@@ -1688,6 +1720,9 @@
     },
     "FireToolMenu_updates_V0_9_2.txt": {
       "checksum": "3ff3d42ccc75aad9a33217b82bf8ed52"
+    },
+    "renv.lock": {
+      "checksum": "ca64f3a2fe3ac2dad514351dba208ad9"
     },
     "SteenAdams_etal_FireToolMenu_AppendixA_260522.xlsx": {
       "checksum": "a602df2927c2c68e34ab1a6483410278"

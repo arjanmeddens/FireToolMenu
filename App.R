@@ -27,7 +27,7 @@ options(repos = c(CRAN = "https://cloud.r-project.org/"))
 #require(shinydashboard)
 
 # Define list of required packages:
-list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT", "zip")
+list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT") #, "zip")
 # Check for packages and install if needed:
 new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
 if(length(new.packages) > 0) install.packages(new.packages,repos = "https://cran.rstudio.com/")

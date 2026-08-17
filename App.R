@@ -20,9 +20,9 @@
 #remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
 #install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
 #install.packages("shinyWidgets")
-library(shinydashboard)
-library(shinyWidgets)
-library(shiny)
+#library(shinydashboard)
+#library(shinyWidgets)
+#library(shiny)
 
 #require(shinydashboard)
 
@@ -223,7 +223,7 @@ ui <- shinydashboard::dashboardPage(
               style = "font-family: 'arial'; font-size: 18pt;",
               shiny::fluidRow(
                 shiny::column(width=3,
-                  pickerInput("dropdown1", h3("Phase (Select your descision phase):"), choices = phase, multiple = T), #-- PHASE --#
+                  shinyWidgets::pickerInput("dropdown1", h3("Phase (Select your descision phase):"), choices = phase, multiple = T), #-- PHASE --#
                   htmltools::p(linebreaks(3))),
                 shiny::column(width=3,
                   uiOutput("dropdown2"), #-- STEP --#
@@ -660,13 +660,13 @@ server <- function(input, output, session) {
   
   ## Reactive Dropdown 2 # STEP 
   output$dropdown2 <- renderUI({
-    pickerInput("dropdown2", h3("Step (Select your descision Step):"), choices = values.func2(), multiple = T, options = pickerOptions(
+    shinyWidgets::pickerInput("dropdown2", h3("Step (Select your descision Step):"), choices = values.func2(), multiple = T, options = pickerOptions(
     actionsBox = TRUE,title = "Please select a Descision Step"))
   })
      
   ## Reactive Dropdown 3 # TOOL
   output$dropdown3 <- renderUI({
-    pickerInput("dropdown3", h3("Tool (select tool for more Information):"), choices = values.func3(), multiple = T, options = pickerOptions(
+    shinyWidgets::pickerInput("dropdown3", h3("Tool (select tool for more Information):"), choices = values.func3(), multiple = T, options = pickerOptions(
     actionsBox = TRUE,title = "Please select a Tool"))
   })
 

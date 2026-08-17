@@ -20,9 +20,9 @@
 #remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
 #install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
 #install.packages("shinyWidgets")
-# library(shinydashboard)
-# library(shinyWidgets)
-# library(shiny)
+library(shinydashboard)
+library(shinyWidgets)
+library(shiny)
 
 #require(shinydashboard)
 

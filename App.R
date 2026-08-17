@@ -1,5 +1,5 @@
 #############################################################################################################################################
-# Script Name:  app.r
+# Script Name:  App.R
 # Description:  Select post-fire management tools
 # Author:       Arjan Meddens (& NW CASC project group)
 # Date:         Jun 2026
@@ -16,7 +16,7 @@
 #
 #############################################################################################################################################
 # LOAD PACKAGES
-options(repos = c(CRAN = "https://cloud.r-project.org/"))
+#options(repos = c(CRAN = "https://cloud.r-project.org/"))
 #remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
 #install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
 #install.packages("shinyWidgets")
@@ -27,14 +27,14 @@ options(repos = c(CRAN = "https://cloud.r-project.org/"))
 #require(shinydashboard)
 
 # Define list of required packages:
-list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT") #, "zip")
+#list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT", "zip")
 # Check for packages and install if needed:
-new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
+#new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
 #if(length(new.packages) > 0) install.packages(new.packages,repos = "https://cran.rstudio.com/")
 
 # load all packages
-vapply(list_of_packages, library, logical(1L),
-       character.only = TRUE, logical.return = TRUE)
+#vapply(list_of_packages, library, logical(1L),
+#       character.only = TRUE, logical.return = TRUE)
 
 
 # Helper function to iterate line breaks (`br()`) of "n" times

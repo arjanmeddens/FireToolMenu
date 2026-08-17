@@ -30,7 +30,7 @@ options(repos = c(CRAN = "https://cloud.r-project.org/"))
 list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT") #, "zip")
 # Check for packages and install if needed:
 new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
-if(length(new.packages) > 0) install.packages(new.packages,repos = "https://cran.rstudio.com/")
+#if(length(new.packages) > 0) install.packages(new.packages,repos = "https://cran.rstudio.com/")
 
 # load all packages
 vapply(list_of_packages, library, logical(1L),

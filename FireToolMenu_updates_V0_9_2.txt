@@ -1,0 +1,31 @@
+FireToolMenu V0.9.2 updates
+
+Summary of the latest update:
+Multi-step selection feature. Users can "Select all" and "Deselect all" options in the "Decision step" input box (similar to tools)
+Output table consists of Decision phase and Decision step columns
+New table, "DST_table_v7.csv":
+"All" option in `Decision step` column changed to "Cross-cutting"
+Correction: "Asses" to "Assess" in `Decision step` column
+Correction: "LANFIRE" to "LANDFIRE" in `Short title` and `Tool name` columns
+Data source changed from DST_table_v6.csv to DST_table_v7.csv on the R code
+Clean up code:
+Add descriptive comments
+Rearrange code on the server end. As code on the server comprises mostly reactive functions, the order of code does not matter. The code is now rearranged in functional groups: dynamic input, core logic, dynamic output and download
+
+FireToolMenu V0.9.1 updates
+
+- Multi-selection feature for the available tools (after users select the "Phase" and "Step" inputs).
+-- The selected tools are displayed in an interactive table using the `datatable` element from the `DT` R package (https://rstudio.github.io/DT/)
+-- `inputdropdown3_selectOpt` is a reactive function that concatenates multiple selection of `input$dropdown3` as a single string for printing as output.
+-- `get_SelectedToolTable()` is a reactive function that returns a `data.frame` used to render the data.table output
+-- Relevant code can be found in lines: #L218, #L236, #L849, #L866 
+
+- Download feature to get the available tools table as a csv, with a metadata file (.txt)
+-- download feature is carried out via the `shiny::downloadHandler` (see download logic in the code under output$downloadTable)
+-- the `get_SelectedChoicesMetadata()` is used for creating the metadata file. The function returns a character string used to write out the metadata as a txt file.
+-- Relevant code can be found in lines: #L239, #L727
+
+- Make the navigation sidebar static (cannot collapse, no menu items that can be hidden)
+-- set default behavior of sidebar to load un-collapsed
+-- add CSS style for navbar to remove the toggle to collapse the side bar
+-- Relevant code can be found in lines: #L59, #L77

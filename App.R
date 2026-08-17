@@ -17,19 +17,17 @@
 #############################################################################################################################################
 # LOAD PACKAGES
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
-remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
-install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
-install.packages("shinyWidgets")
- library(shinydashboard)
- library(shinyWidgets)
- library(shiny)
+#remotes::install_github("dreamRs/shinyWidgets",force = TRUE)
+#install.packages("shiny",repos = c(CRAN = "https://cloud.r-project.org/"))
+#install.packages("shinyWidgets")
+# library(shinydashboard)
+# library(shinyWidgets)
+# library(shiny)
 
-require(shinydashboard)
-
-print("check for testing")
+#require(shinydashboard)
 
 # Define list of required packages:
-#list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT")
+list_of_packages <- c("shinydashboard", "shinyWidgets", "shiny", "htmltools", "DT", "zip")
 # Check for packages and install if needed:
 new.packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
 if(length(new.packages) > 0) install.packages(new.packages,repos = "https://cran.rstudio.com/")
@@ -44,7 +42,7 @@ linebreaks <- function(n){htmltools::HTML(strrep(htmltools::tags$br(), n))}
 
 # LOAD DATA:
 # Load tool table
-table_dst = read.csv("DST_table_v5.csv") # update May 26 2026
+table_dst = read.csv("DST_table_v7.csv") # update Aug 5 2026
 #names(table_dst)
 #dim(table_dst)
 phase  = levels(factor(table_dst[,9]))
@@ -373,7 +371,7 @@ ui <- shinydashboard::dashboardPage(
                         collapsible = TRUE,
                         title = htmltools::div(class = 'box-title', htmltools::p('Acknowledgements')),
                         linebreaks(2),
-                        htmltools::p(tags$i("TEXT TO BE PROVIDED BY MICHELE")),style = "font-family: 'arial'; font-si24pt",htmltools::tags$br(),width=12)
+                        htmltools::p(tags$i("We thank the many natural resource professionals, along with community-based organization members and scientists, who provided valueable feedback to this website. Organizations include: Malheur National Forest; Umatilla National Forest; Washington Dept of Natural Resources; Blue Mountains Forest Partners, Wallowa Resources; Sustainable Northwest. ")),style = "font-family: 'arial'; font-si24pt",htmltools::tags$br(),width=12)
             )
         
           ) # FLUIDROW
@@ -459,6 +457,8 @@ ui <- shinydashboard::dashboardPage(
 # server <- shinyServer(function(input, output, session) { 
 server <- function(input, output, session) {
 
+
+  #---- Interactive ArcGIS Online viewer and CSS style ----
   # https://stackoverflow.com/questions/41882658/embed-container-arcgis-online-iframe-using-shiny-r
  output$arcFrame <- shiny::renderUI({
   
@@ -557,100 +557,86 @@ server <- function(input, output, session) {
     </div>
   ')
  })
+  
+ # ---- DYNAMIC INPUT ----
 
+  # Reactive function that concatenates multiple selection of input$dropdown1 as single string for print
+  inputdropdown1_selectOpt <- shiny::reactive({  
+      if(length(input$dropdown1) > 1){
+        strOut <- as.character()
+        for(i in 1:length(input$dropdown1)){
+          strOut <- cbind(strOut, input$dropdown1[i])
+        }
+        return(toString(strOut))
+      } else{
+        return(input$dropdown1)
+      }
+  })
+  
+  
+  # Reactive function that concatenates multiple selection of input$dropdown2 as single string for print
+  inputdropdown2_selectOpt <- shiny::reactive({  
+    if(length(input$dropdown2) > 1){
+      strOut <- as.character()
+      for(i in 1:length(input$dropdown2)){
+        strOut <- cbind(strOut, input$dropdown2[i])
+      }
+      return(toString(strOut))
+    } else{
+      return(input$dropdown2)
+    }
+  })
+  
+  
+  # Reactive function that concatenates multiple selection of input$dropdown3 as single string for print
+  inputdropdown3_selectOpt <- shiny::reactive({  
+      if(length(input$dropdown3) > 1){
+        strOut <- as.character()
+        for(i in 1:length(input$dropdown3)){
+          strOut <- cbind(strOut, input$dropdown3[i])
+        }
+        return(toString(strOut))
+      } else{
+        return(input$dropdown3)
+      }
+  })
 
+  
+ # ---- CORE LOGIC ----
+ # - Tool selection from main table based on inputs 1 and 2
 
-   ## Dropdown 2 -- Reaction values function 
+ ## Dropdown 2 -- Reaction values function (STEP)
+ # -- Any input from dropdown1 will trigger the step options stored in `step` to populate dropdown2
   values.func2 <- shiny::reactive({
     req(input$dropdown1)
-    if (length(input$dropdown1) == 1) {
-      if (input$dropdown1 == "x") {
-        c("Assess","Engage","Plan","Implement","Monitor & Evaluate","All")
+    if (length(input$dropdown1) == 1 && input$dropdown1 == "x") {
+      step
       }
-      else {
-        c("Assess","Engage","Plan","Implement","Monitor & Evaluate","All")
-      }
-    }
     else {
-      c("Assess","Engage","Plan","Implement","Monitor & Evaluate","All")
+      step
     }
-    
   })
 
-  ## Dropdown 3 -- Reaction values function # Tool name
+  
+  ## Dropdown 3 -- Reaction values function # TOOL 
   values.func3 <- shiny::reactive({
     req(input$dropdown2)
-    if (length(input$dropdown1) == 1) {
-      # testing 
-      #tmp1_index  = which(table_dst[,3] ==  "Restore & Adapt")
-      #tmp_dst  = table_dst[tmp1_index,]
-      #tmp2_index  = which(tmp_dst[,4] ==  "Plan")
-      #tmp_dst2 = tmp_dst[tmp2_index,]
-      if(input$dropdown2 == c("All")) {
-        tmp1_index  = which(table_dst[,9] ==  input$dropdown1)
-        tmp_dst2 = table_dst[tmp1_index,]
-        if(length(c(tmp_dst2[,2]))==0){
-          return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
-        } else {
-          input3Choices <<- c(tmp_dst2[,2])
-          return(c(tmp_dst2[,2]))  
-        }
-        
-      } else {
-        tmp1_index  = which(table_dst[,9] ==  input$dropdown1)
-        tmp_dst = table_dst[tmp1_index,]
-        tmp2_index  = which(tmp_dst[,10] ==  input$dropdown2)
-        tmp_dst2 = tmp_dst[tmp2_index,]
-        if(length(c(tmp_dst2[,2]))==0){
-          return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
-        } else {
-          return(c(tmp_dst2[,2]))  
-        }
-        
-      }
+    
+    # Filter and subset main table `table_dst` by phase(s) selected via `input$dropdown1`
+    tmp1_index  = which(table_dst[,9] %in% input$dropdown1)
+    tmp_dst = table_dst[tmp1_index,]
+    
+    # Filter and subset by step(s) selected via `input$dropdown2`
+    tmp2_index  = which(tmp_dst[,10] %in%  input$dropdown2)
+    tmp_dst2 = tmp_dst[tmp2_index,]
+    
+    if(length(c(tmp_dst2[,2]))==0){
+      return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
+    } else {
+      return(c(tmp_dst2[,2]))  
     }
-    if (length(input$dropdown1) == 2) {
-      tmp1_index  = which(table_dst[,9] ==  input$dropdown1[1] | table_dst[,9] ==  input$dropdown1[2])
-      tmp_dst = table_dst[tmp1_index,]
-      tmp2_index  = which(tmp_dst[,10] ==  input$dropdown2[1])
-      tmp_dst2 = tmp_dst[tmp2_index,]
-      if(length(c(tmp_dst2[,2]))==0){
-          return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
-        } else {
-          return(c(tmp_dst2[,2]))  
-        }
       
-    }
-    if (length(input$dropdown1) == 3) {
-      tmp1_index  = which(table_dst[,9] ==  input$dropdown1[1] | table_dst[,10] ==  input$dropdown1[2] | table_dst[,11] ==  input$dropdown1[3])
-      tmp_dst = table_dst[tmp1_index,]
-      tmp2_index  = which(tmp_dst[,9] ==  input$dropdown2[1])
-      tmp_dst2 = tmp_dst[tmp2_index,]
-      if(length(c(tmp_dst2[,2]))==0){
-          return(c('NO TOOLS AVAILABLE FOR SELECTED OPTIONS'))
-        } else {
-          return(c(tmp_dst2[,2]))  
-        }
-      
-    }
-  })
 
- 
-   
-  
-  #----------------------------------------------------------------------------------------------
-  ## Reactive Dropdown 2 # STEP out
-  output$dropdown2 <- renderUI({
-    #htmltools::HTML(paste0("Output 1 here", collapse = "<br>"))
-    # print("HERE2")
-    pickerInput("dropdown2", h3("Step (Select your descision Step):"), choices = values.func2(), options = pickerOptions(
-      actionsBox = TRUE,title = "Please select a Descision Step"))
-  })
-     
-  ## Reactive Dropdown 3 # TASK out
-  output$dropdown3 <- renderUI({
-    pickerInput("dropdown3", h3("Tool (select tool for more Information):"), choices = values.func3(), multiple = T, options = pickerOptions(
-      actionsBox = TRUE,title = "Please select a Tool"))
   })
 
   # Check the outputs of the tool selection, warn user if there are no tools found
@@ -667,75 +653,53 @@ server <- function(input, output, session) {
     }
   })
 
+  # ---- DYNAMIC OUTPUT & DOWNLOAD ----
 
-# Reactive function that concatenates multiple selection of input$dropdown1 as single string for print
-inputdropdown1_selectOpt <- shiny::reactive({  
-    if(length(input$dropdown1) > 1){
-      strOut <- as.character()
-      for(i in 1:length(input$dropdown1)){
-        strOut <- cbind(strOut, input$dropdown1[i])
-      }
-      return(toString(strOut))
-    } else{
-      return(input$dropdown1)
-    }
-})
+  ## ---- shiny::reactive() functions for dynamic input choices ----
+  # - i.e., available inputs downstream vary based on upstream choices made
   
+  ## Reactive Dropdown 2 # STEP 
+  output$dropdown2 <- renderUI({
+    pickerInput("dropdown2", h3("Step (Select your descision Step):"), choices = values.func2(), multiple = T, options = pickerOptions(
+    actionsBox = TRUE,title = "Please select a Descision Step"))
+  })
+     
+  ## Reactive Dropdown 3 # TOOL
+  output$dropdown3 <- renderUI({
+    pickerInput("dropdown3", h3("Tool (select tool for more Information):"), choices = values.func3(), multiple = T, options = pickerOptions(
+    actionsBox = TRUE,title = "Please select a Tool"))
+  })
 
-# Reactive function that concatenates multiple selection of input$dropdown3 as single string for print
-inputdropdown3_selectOpt <- shiny::reactive({  
-    if(length(input$dropdown3) > 1){
-      strOut <- as.character()
-      for(i in 1:length(input$dropdown3)){
-        strOut <- cbind(strOut, input$dropdown3[i])
-      }
-      return(toString(strOut))
-    } else{
-      return(input$dropdown3)
-    }
-})
 
+  ## ---- reactive functions for dynamic OUTPUT window ----
+  ## includes:
+  ## - text output "Choices"
+  ## - interactive table output
+  ## - download feature
 
   ## Reactive Output text 1
   output$selected_var1 <- shiny::renderText({
       req(input$dropdown1, input$dropdown2, input$dropdown3) # clears output if user reselects options
-      paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", input$dropdown2), "Tool: ",  paste("-", inputdropdown3_selectOpt()), sep='\n')
+      paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", inputdropdown2_selectOpt()), "Tool: ",  paste("-", inputdropdown3_selectOpt()), sep='\n')
   })
-
-
-  #  ## Reactive Output text 2
-#  output$selected_var2 <- shiny::renderText({
-#    paste(input$dropdown2,"Choice")
-#  })
-#  ## Reactive Output text 3
-#  output$selected_var3 <- shiny::renderText({
-#    paste(input$dropdown3,"Choice")
-#  })
   
 
   get_SelectedToolTable <- shiny::reactive({
     req(values.func3())  # ensures it’s available before rendering
     selectedTools <- c(input$dropdown3) # pass `values.func()` to output ALL AVAILABLE TOOLS
 
-    # Testing
-     #print(paste0('returned values: ', selectedTools)) # Testing
-     #selectedTools = "PFS Decision Tree"
-     #subsetDF <- table_dst[table_dst$Short.Title %in% selectedTools, ]
-    # Testing
-     
     subsetDF <- table_dst[table_dst$Short.Title %in% selectedTools, ]
-    outDF <- subsetDF[,c(3, 4, 5, 15)]  #- OLD: subsetDF[,c(2, 7:9)]   # outDF only has 4 columns (tool, desc, URL, citation) # UPDATE: 
+    outDF <- subsetDF[,c(9, 10, 3, 4, 5, 15)]  # CHANGE #COLUMN HERE to add/remove columns in the output table
     colnames(outDF)[colnames(outDF) == "Short.Title"] <- "Tool"
     return(outDF)
     }
   )
   get_SelectedChoicesMetadata <- shiny::reactive({
     req(input$dropdown1, input$dropdown2, input$dropdown3) # clears output if user reselects options
-    outMetaTxt <- paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", input$dropdown2), "Tool: ",  paste("-", inputdropdown3_selectOpt()), sep='\n')
+    outMetaTxt <- paste("Phase: ", paste("-", inputdropdown1_selectOpt()), "Step: ",  paste("-", inputdropdown2_selectOpt()), "Tool: ",  paste("-", inputdropdown3_selectOpt()), sep='\n')
     return(outMetaTxt)
   })
 
-  # selectedTools <- c('Short BAR guide', 'Data Basin', 'ClimResilToolkit') # replace this is `values.func3()`
   output$toolTable <- DT::renderDT({
       DT::datatable(get_SelectedToolTable(), 
                     extensions = c("FixedColumns","FixedHeader"), # Enables fixed header and column (https://stackoverflow.com/questions/69835894/workaround-for-issues-with-freezing-header-in-dtdatatable-in-r-shiny)
@@ -778,10 +742,6 @@ inputdropdown3_selectOpt <- shiny::reactive({
     )
 
   
-  #- Testing
-  #dropdown3 = c("A guidebook to spatial datasets for conservation planning under climate change in the Pacific Northwest")
-  #table_dst[c(which(table_dst[,1] == dropdown3)),8]
-  #paste((table_dst[c(which(table_dst[,1] == dropdown3)),8]),"Choice")
   
   #- Update pickerboxes instantaneously
   shiny::observe({
